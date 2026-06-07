@@ -1,0 +1,28 @@
+.sidebar {
+    width: 250px;
+    background-color: #1f2937;
+    color: white;
+    padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.sidebar-nav-item {
+    text-decoration: none;
+    color: blanchedalmond;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.sidebar-nav-item.active {
+    font-weight: bold;
+    color: rgb(173, 108, 11);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.sidebar-nav-item:hover {
+    color: blue;
+}

@@ -1,0 +1,17 @@
+.navlink {
+    color: white;
+    text-decoration: none;
+}
+
+.navlink.active {
+    color: red;
+    font-weight: bold;
+}
+
+.navbar-container {
+    background-color: seagreen;
+    height: 50px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
