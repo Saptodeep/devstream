@@ -38,9 +38,17 @@ const addCourse = async (req, res) => {
         })
         return res.status(201).json({ message: "Course created successfully", course })
     } catch (error) {
-        if(error.code === 11000){ //MongoDB duplicate-key error code is: 11000
-            return res.status(409).json({error: "Course already exists"})
+        if (error.code === 11000) { //MongoDB duplicate-key error code is: 11000
+            return res.status(409).json({ error: "Course already exists" })
         }
+        if(error.name === 'ValidationError'){
+            return res.status(400).json({error: error.message})
+        }
+        console.log("add course error: ", {
+            errorName: error.name,
+            errorMessage: error.message
+        }
+        );
         return res.status(500).json({ error: "Internal Server error" })
     }
 }
@@ -52,7 +60,10 @@ const updateCourse = async (req, res) => {
         const course = await Course.findByIdAndUpdate(
             courseId,
             { name },
-            { new: true } //this returns document after update
+            { 
+                new: true,
+                runValidators: true
+             } //new: true - this returns document after update //runValidators: true - this runs the schema validations
         );
         if (!course) return res.status(404).json({ error: "No course found" })
         return res.status(200).json({ message: `Course with id:${courseId} updated`, course })
