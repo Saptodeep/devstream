@@ -43,13 +43,15 @@ const router = createBrowserRouter([
                     })
                     const formData = await request.formData();
                     const courseName = formData.get('course-name');
+                    const courseDescription = formData.get('course-description');
                     const response = await fetch('http://localhost:8000/api/courses', {
                         method: 'POST',
                         headers: {
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
-                            name: courseName
+                            name: courseName,
+                            description: courseDescription
                         })
                     });
                     if (!response.ok) {

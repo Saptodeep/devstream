@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
-const router = require('./routes/courseRoutes');
+const courseRouter = require('./routes/courseRoutes');
+const authRouter = require('./routes/authRoutes');
 const loggerMiddleware = require('./middlewares/loggerMiddleware');
 const connectDB = require('./config/db');
 const cors = require('cors');
@@ -25,7 +26,8 @@ app.get('/', (req, res) => {
     res.send("Backend App running")
 });
 app.use(loggerMiddleware);
-app.use('/api/courses', router);
+app.use('/api/courses', courseRouter);
+app.use('/api/auth', authRouter);
 
 startServer();
 

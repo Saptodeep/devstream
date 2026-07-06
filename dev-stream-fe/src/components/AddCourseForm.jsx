@@ -9,6 +9,9 @@ const AddCourseForm = () => {
         <>
             <Form action="/courses" method="post">
                 <input type="text" placeholder="Add Course" name="course-name"/>
+                <div>
+                    <textarea name="course-description" placeholder="Course Description"/>
+                </div>
                 <button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Adding...' : 'Add'}</button>
             </Form>
         </>

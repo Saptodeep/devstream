@@ -30,11 +30,12 @@ const getCourseById = async (req, res) => {
 
 const addCourse = async (req, res) => {
     console.log("Course added req: ", req.body);
-    const name = req.body?.name;
+    const {name, description} = req.body;
     try {
         //Save the added course to MongoDB
         const course = await Course.create({
-            name
+            name,
+            description
         })
         return res.status(201).json({ message: "Course created successfully", course })
     } catch (error) {
@@ -55,20 +56,23 @@ const addCourse = async (req, res) => {
 
 const updateCourse = async (req, res) => {
     const courseId = req.params?.id;
-    const name = req.body?.name;
+    const {name, description} = req.body;
     try {
         const course = await Course.findByIdAndUpdate(
             courseId,
-            { name },
+            { name, description },
             { 
                 new: true,
                 runValidators: true
-             } //new: true - this returns document after update //runValidators: true - this runs the schema validations
+            } //new: true - this returns document after update //runValidators: true - this runs the schema validations
         );
         if (!course) return res.status(404).json({ error: "No course found" })
         return res.status(200).json({ message: `Course with id:${courseId} updated`, course })
 
     } catch (error) {
+        if(error.name === 'ValidationError'){
+            return res.status(400).json({error: error.message})
+        }
         return res.status(500).json({ error: "Internal server error" })
     }
 }

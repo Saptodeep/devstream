@@ -20,6 +20,7 @@ const Courses = () => {
                     return (
                     <li key={course._id}>
                         <Link to={`/courses/${courseNameForUrl}`}>{course.name}</Link>
+                        <p>{course.description}</p>
                     </li>
                     )
                 })}
