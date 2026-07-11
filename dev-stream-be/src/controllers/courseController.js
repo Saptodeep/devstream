@@ -8,9 +8,50 @@ const getCourses = async (req, res) => {
     //     { id: 4, name: "MongoDB" }
     // ]
     // res.json(coursesData);
+
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const search = req.query.search?.trim();
+    const category = req.query.category?.trim();
+
+    const filter = {};
+
+    if(search){
+        filter.name = {
+            $regex: search,
+            $options: "i"  //case-insensitive
+        }
+    }
+
+    if(category){
+        filter.category = category.toLowerCase();
+    }
+
+    console.log("Page, limit, skip: ", page, limit, skip);
     try {
-        const courses = await Course.find();
-        return res.status(200).json(courses);
+        
+        const [totalCourses, courses] = await Promise.all([
+            Course.countDocuments(filter),
+            Course.find(filter)
+                .sort({createdAt: -1})
+                .skip(skip)
+                .limit(limit)
+        ]);
+
+        const totalPages = Math.ceil(totalCourses / limit);
+
+        const response = {
+            courses,
+            pagination: {
+                currentPage: page,
+                limit,
+                totalCourses,
+                totalPages
+            }
+        }
+        return res.status(200).json(response);
     } catch (error) {
         return res.status(500).json({ error: "Internal Server Error" })
     }
@@ -30,20 +71,21 @@ const getCourseById = async (req, res) => {
 
 const addCourse = async (req, res) => {
     console.log("Course added req: ", req.body);
-    const {name, description} = req.body;
+    const { name, description, category } = req.body;
     try {
         //Save the added course to MongoDB
         const course = await Course.create({
             name,
-            description
+            description,
+            category
         })
         return res.status(201).json({ message: "Course created successfully", course })
     } catch (error) {
         if (error.code === 11000) { //MongoDB duplicate-key error code is: 11000
             return res.status(409).json({ error: "Course already exists" })
         }
-        if(error.name === 'ValidationError'){
-            return res.status(400).json({error: error.message})
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ error: error.message })
         }
         console.log("add course error: ", {
             errorName: error.name,
@@ -56,12 +98,12 @@ const addCourse = async (req, res) => {
 
 const updateCourse = async (req, res) => {
     const courseId = req.params?.id;
-    const {name, description} = req.body;
+    const { name, description, category } = req.body;
     try {
         const course = await Course.findByIdAndUpdate(
             courseId,
-            { name, description },
-            { 
+            { name, description, category },
+            {
                 new: true,
                 runValidators: true
             } //new: true - this returns document after update //runValidators: true - this runs the schema validations
@@ -70,8 +112,8 @@ const updateCourse = async (req, res) => {
         return res.status(200).json({ message: `Course with id:${courseId} updated`, course })
 
     } catch (error) {
-        if(error.name === 'ValidationError'){
-            return res.status(400).json({error: error.message})
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ error: error.message })
         }
         return res.status(500).json({ error: "Internal server error" })
     }

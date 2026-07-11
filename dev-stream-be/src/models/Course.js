@@ -12,6 +12,11 @@ const courseSchema = new mongoose.Schema({
         type: String,
         trim: true,
         maxlength: [500, "Description cannot exceed 500 characters"]
+    },
+    category: {
+        type: String,
+        enum: ['frontend', 'backend', 'database', 'devops', 'cloud'],
+        required: true
     }
 },{timestamps: true})
 
